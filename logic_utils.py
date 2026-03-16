@@ -24,3 +24,21 @@ def check_guess(guess, secret):
 def update_score(current_score: int, outcome: str, attempt_number: int):
     """Update score based on outcome and attempt number."""
     raise NotImplementedError("Refactor this function from app.py into logic_utils.py")
+
+
+def reset_game(state: dict, low: int, high: int) -> dict:
+    """
+    Reset game state for a new game.
+
+    Mutates and returns the state dict with:
+      - attempts reset to 0
+      - a new random secret in [low, high]
+      - status set to "playing"
+      - history cleared
+    """
+    import random
+    state["attempts"] = 0
+    state["secret"] = random.randint(low, high)
+    state["status"] = "playing"
+    state["history"] = []
+    return state

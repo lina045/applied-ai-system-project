@@ -8,6 +8,11 @@ Answer each question in 3 to 5 sentences. Be specific and honest about what actu
 - List at least two concrete bugs you noticed at the start  
   (for example: "the secret number kept changing" or "the hints were backwards").
 
+- #1 “Press Enter to Apply” did absolutely nothing, you had to press on the submit guess to actually get the app to do anything 
+- #2 If the hint is the same, nothing changes when entering a new number, so its hard to know if it actually did anything 
+- #3 Pressing new game doesn't do anything (only number of retries resets)
+- #4 Also amount of retries it said I had did not match the amount I was actually given 
+
 ---
 
 ## 2. How did you use AI as a teammate?
@@ -16,6 +21,10 @@ Answer each question in 3 to 5 sentences. Be specific and honest about what actu
 - Give one example of an AI suggestion that was correct (including what the AI suggested and how you verified the result).
 - Give one example of an AI suggestion that was incorrect or misleading (including what the AI suggested and how you verified the result).
 
+- Used Claude as the AI tool for this project 
+- Focused on the issue where pressing the enter key doesn't actually submit the number, you have to manually press the submit button for it do anything 
+- The first thing I did was input the issue and ask the reasoning behind it, but it returned 
+- 
 ---
 
 ## 3. Debugging and testing your fixes
