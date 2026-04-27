@@ -119,7 +119,9 @@ def clamp_score(score):
 
 st.set_page_config(page_title="AI Code Tools", page_icon="🎮")
 
-tab_game, tab_detective = st.tabs(["🎮 Glitchy Guesser", "🕵️ AI Bug Detective"])
+tab_game, tab_detective, tab_diagram = st.tabs(
+    ["🎮 Glitchy Guesser", "🕵️ AI Bug Detective", "📊 System Diagram"]
+)
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -342,3 +344,75 @@ decide how deeply to reason before responding. All three calls are logged to the
                         if critique:
                             st.markdown(critique)
                             st.success("Pipeline complete — all three agent steps finished.")
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# Tab 3 — System Diagram
+# ═══════════════════════════════════════════════════════════════════════════════
+
+with tab_diagram:
+    st.title("📊 System Diagram")
+    st.caption("How data flows through the AI Bug Detective pipeline.")
+
+    import streamlit.components.v1 as components
+
+    _DIAGRAM = """
+flowchart TD
+    User([\"👤 User\\npastes Python code\"])
+    Validator[\"🛡️ Input Validator\\nGuardrail: checks length and empty\"]
+    Err[\"⚠️ Error message\\nreturned to user\"]
+
+    subgraph Agent [\"Agentic Workflow — claude-opus-4-7 + adaptive thinking\"]
+        Step1[\"🔍 Step 1 · Analyzer\\nStreams a live bug report\"]
+        Step2[\"🔧 Step 2 · Fixer\\nGenerates corrected code\"]
+        Step3[\"🎯 Step 3 · Evaluator\\nSelf-critiques the fix\"]
+    end
+
+    Results[\"📋 Results\\nBug list · Fixed code · Verdict\"]
+    Human([\"👤 Human Review\\nUser reads output and decides\\nwhether to apply the fix\"])
+    Tests[\"🧪 pytest — 15 tests\\nparse_guess · check_guess\\nupdate_score · reset_game\"]
+
+    User --> Validator
+    Validator -- \"invalid input\" --> Err
+    Validator -- \"valid code\" --> Step1
+    Step1 -- \"bug report\" --> Step2
+    Step2 -- \"fixed code\" --> Step3
+    Step3 -- \"verdict\" --> Results
+    Results --> Human
+    Tests -. \"automated regression\\nchecks on game logic\" .-> Human
+
+    style Step1 fill:#dbeafe
+    style Step2 fill:#dbeafe
+    style Step3 fill:#dbeafe
+    style Tests fill:#fef9c3
+    style Human fill:#dcfce7
+"""
+
+    components.html(
+        f"""
+        <script type="module">
+          import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+          mermaid.initialize({{ startOnLoad: true, theme: 'default' }});
+        </script>
+        <div class="mermaid" style="font-size:14px; padding:12px;">
+        {_DIAGRAM}
+        </div>
+        """,
+        height=620,
+    )
+
+    st.markdown("---")
+    st.markdown(
+        """
+**Component key**
+
+| Component | Role |
+|-----------|------|
+| 🛡️ Input Validator | Guardrail — rejects empty or oversized input before any API call |
+| 🔍 Analyzer (Step 1) | Agent — streams a numbered bug report from the model in real time |
+| 🔧 Fixer (Step 2) | Agent — uses the bug report as context to produce corrected code |
+| 🎯 Evaluator (Step 3) | Agent — self-critiques the fix; outputs PASS ✅ or NEEDS REVISION ⚠️ |
+| 👤 Human Review | Trust layer — the user decides whether to accept and apply the fix |
+| 🧪 pytest | Automated testing — 15 regression tests cover the core game logic |
+"""
+    )
