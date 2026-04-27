@@ -1,5 +1,17 @@
 # Applied AI System: AI Bug Detective
 
+## Video Walkthrough
+
+[▶ Watch the Loom walkthrough](https://www.loom.com/share/YOUR_LOOM_ID_HERE)
+
+---
+
+## Portfolio Reflection
+
+This project shows that I can move beyond using AI as a search engine and start designing with it as infrastructure. I built a system where three AI calls work together — each one passing real output to the next — instead of asking a single prompt to do everything at once. I wrote tests that proved the guardrails work before a user ever touches the app. I ran into cases where the AI gave confident advice that was wrong for my specific situation, and I learned to verify rather than trust. For me, that's what an AI engineer actually does: not just prompt a model, but design a system around it that is checkable, explainable, and safe enough for someone else to use.
+
+---
+
 ## Original Project
 
 This project extends **Game Glitch Investigator** (Module 1), a Streamlit-based number-guessing game that was intentionally shipped with bugs. The original goal was to experience what it feels like to debug AI-generated code: the secret number would reset on every guess, hints pointed the wrong direction, and the "New Game" button did nothing. Students played the broken game, identified the bugs using an AI assistant, and fixed them learning about Streamlit session state, form handling, and how to ask better questions of AI tools.
@@ -311,16 +323,13 @@ I expected writing tests to confirm things I already knew were working. Instead,
 
 ### Collaboration with AI during this project
 
-**One helpful suggestion:** The AI fixer kept adding explanation around the corrected code — sentences like "Here is the fixed version:" — even when asked not to. When I described the problem, the AI suggested a two-part fix: be more explicit in the instructions, and also write a backup that strips any extra text automatically. I wouldn't have thought to do both at once, but having that safety net meant the tool worked reliably even when the model didn't follow directions perfectly.
+1. The AI fixer kept adding explanation around the corrected code ,sentences like "Here is the fixed version:",even when asked not to. When I described the problem, the AI suggested a two-part fix: be more explicit in the instructions, and also write a backup that strips any extra text automatically. I wouldn't have thought to do both at once, but having that safety net meant the tool worked reliably even when the model didn't follow directions perfectly.
 
-**One flawed suggestion:** Early on, the AI suggested a standard way to stop the game screen from showing after a player won or lost. The suggestion worked fine on its own, but it silently broke the other two tabs — they stopped rendering entirely. The AI gave advice that was correct in the most common situation but didn't account for the specific setup I was using. It was a good reminder that AI suggestions are drawn from patterns; if your situation is slightly different from the usual case, the advice can sound confident and still be wrong.
+2. Early on, the AI suggested a standard way to stop the game screen from showing after a player won or lost. The suggestion worked fine on its own, but it silently broke the other two tabs and they stopped rendering entirely. The AI gave advice that was correct in the most common situation but didn't account for the specific setup I was using. 
 
 ---
 
 ## Reflection
 
-This project changed how I think about what "using AI" actually means in practice. In the original module, I used Claude as a search engine, I pasted an error and waited for an answer. Building the Bug Detective forced me to think about AI as infrastructure, asking questions like: how do you structure a pipeline so each step produces output the next step can actually use? How do you handle a model that sometimes wraps its answer in prose you didn't ask for? How do you give a user enough information to make a trust decision without overwhelming them?
-
-The self-critique step (Step 3) was the most instructive part. I assumed that if the model wrote a fix, it would be confident the fix was right. But the Evaluator regularly catches its own mistakes, not because it was told to find them, but because reading the original code, the bug list, and the proposed fix together creates enough context for it to reason about correctness independently. That's genuinely different from a spell-checker or a linter. It's closer to asking a second developer to review a pull request
-
-The biggest takeaway is that AI reliability comes from design, not from the model alone. A model that can do three things well (analyze, fix, verify) is more trustworthy than the same model asked to do all three in one shot, because each step is checkable. That principle, breaking the problem into stages, make each stage's output visible, keep a human in the loop at the end, applies well beyond code review
+This project changed how I think about what "using AI" actually means in practice. In the original module, I used Claude as a search engine, I pasted an error and waited for an answer. Building the Bug Detective forced me to think about AI as infrastructure, asking questions like: how do you structure a pipeline so each step produces output the next step can actually use? How do you handle a model that sometimes wraps its answer in prose you didn't ask for? How do you give a user enough information to make a trust decision without overwhelming them? 
+The self-critique step was the most instructive part. I assumed that if the model wrote a fix, it would be confident the fix was right. But the Evaluator regularly catches its own mistakes, not because it was told to find them, but because reading the original code, the bug list, and the proposed fix together creates enough context for it to reason about correctness independently. That's different from a spell-checker. It's closer to asking a second developer to review a pull request The biggest takeaway is that AI reliability comes from design, not from the model alone. A model that can do three things well (analyze, fix, verify) is more trustworthy than the same model asked to do all three in one shot, because each step is checkable. That principle, breaking the problem into stages, make each stage's output visible, keep a human in the loop at the end, applies well beyond the code review

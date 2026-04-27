@@ -1,0 +1,29 @@
+flowchart TD
+    User(["👤 User\npastes Python code"])
+    Validator["🛡️ Input Validator\nGuardrail: checks length and empty"]
+    Err["⚠️ Error message\nreturned to user"]
+
+    subgraph Agent ["Agentic Workflow — claude-opus-4-7 + adaptive thinking"]
+        Step1["🔍 Step 1 · Analyzer\nStreams a live bug report"]
+        Step2["🔧 Step 2 · Fixer\nGenerates corrected code"]
+        Step3["🎯 Step 3 · Evaluator\nSelf-critiques: PASS ✅ or NEEDS REVISION ⚠️"]
+    end
+
+    Results["📋 Results\nBug list · Fixed code · Verdict"]
+    Human(["👤 Human Review\nUser reads output and decides\nwhether to apply the fix"])
+    Tests["🧪 pytest — 26 tests\nparse_guess · check_guess · update_score · reset_game\nvalidate_input · _extract_code"]
+
+    User --> Validator
+    Validator -- "invalid input" --> Err
+    Validator -- "valid code" --> Step1
+    Step1 -- "bug report" --> Step2
+    Step2 -- "fixed code" --> Step3
+    Step3 -- "verdict" --> Results
+    Results --> Human
+    Tests -. "automated regression\nchecks on game logic" .-> Human
+
+    style Step1 fill:#dbeafe
+    style Step2 fill:#dbeafe
+    style Step3 fill:#dbeafe
+    style Tests fill:#fef9c3
+    style Human fill:#dcfce7
