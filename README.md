@@ -295,6 +295,28 @@ Writing tests before fully understanding Streamlit's session state model reveale
 
 ---
 
+## Responsible AI
+
+### Limitations and biases
+
+The system has a few meaningful constraints worth naming. First, the model reasons about code in isolation, it has no knowledge of how a function is called, what data flows through it at runtime, or what the surrounding codebase does. A bug that only appears under a specific sequence of inputs (a race condition, a late-binding closure issue) is unlikely to be caught
+
+### Misuse potential and prevention
+
+The clearest misuse risk is submitting code you don't own the rights to share, pasting proprietary or confidential source code into the tool sends it to Anthropic's API. A secondary risk is using the bug-finder to probe for vulnerabilities in code you intend to exploit rather than fix. The 5,000-character input cap is not a security boundary, but it does prevent bulk or automated abuse of the API key. The most important mitigation built into the design is that the system never applies a fix automatically,every result requires a human to read and act on it, which breaks the loop for purely automated misuse
+
+### What surprised me during reliability testing
+
+I expected writing tests to confirm things I already knew were working. Instead, they kept surfacing assumptions I didn't realize I'd made. For example, I assumed that catching an empty text box and catching a box full of spaces were the same check, they're not, and only writing a test for each made that obvious. The other surprise was in the opposite direction. The code-extraction logic handled more edge cases correctly than I expected without any extra effort, including the case where the model adds a sentence before or after the code block. I had planned to write a more complex fix for that, and the test told me I didn't need to. Testing revealed both where the code was weaker than I thought and where it was stronger
+
+### Collaboration with AI during this project
+
+**One helpful suggestion:** The AI fixer kept adding explanation around the corrected code — sentences like "Here is the fixed version:" — even when asked not to. When I described the problem, the AI suggested a two-part fix: be more explicit in the instructions, and also write a backup that strips any extra text automatically. I wouldn't have thought to do both at once, but having that safety net meant the tool worked reliably even when the model didn't follow directions perfectly.
+
+**One flawed suggestion:** Early on, the AI suggested a standard way to stop the game screen from showing after a player won or lost. The suggestion worked fine on its own, but it silently broke the other two tabs — they stopped rendering entirely. The AI gave advice that was correct in the most common situation but didn't account for the specific setup I was using. It was a good reminder that AI suggestions are drawn from patterns; if your situation is slightly different from the usual case, the advice can sound confident and still be wrong.
+
+---
+
 ## Reflection
 
 This project changed how I think about what "using AI" actually means in practice. In the original module, I used Claude as a search engine, I pasted an error and waited for an answer. Building the Bug Detective forced me to think about AI as infrastructure, asking questions like: how do you structure a pipeline so each step produces output the next step can actually use? How do you handle a model that sometimes wraps its answer in prose you didn't ask for? How do you give a user enough information to make a trust decision without overwhelming them?
