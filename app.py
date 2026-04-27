@@ -370,7 +370,7 @@ flowchart TD
 
     Results[\"📋 Results\\nBug list · Fixed code · Verdict\"]
     Human([\"👤 Human Review\\nUser reads output and decides\\nwhether to apply the fix\"])
-    Tests[\"🧪 pytest — 15 tests\\nparse_guess · check_guess\\nupdate_score · reset_game\"]
+    Tests[\"🧪 pytest — 26 tests\\nparse_guess · check_guess · update_score · reset_game\\nvalidate_input · _extract_code\"]
 
     User --> Validator
     Validator -- \"invalid input\" --> Err
@@ -413,6 +413,6 @@ flowchart TD
 | 🔧 Fixer (Step 2) | Agent — uses the bug report as context to produce corrected code |
 | 🎯 Evaluator (Step 3) | Agent — self-critiques the fix; outputs PASS ✅ or NEEDS REVISION ⚠️ |
 | 👤 Human Review | Trust layer — the user decides whether to accept and apply the fix |
-| 🧪 pytest | Automated testing — 15 regression tests cover the core game logic |
+| 🧪 pytest | Automated testing — 26 tests cover game logic, input validation, and code extraction |
 """
     )

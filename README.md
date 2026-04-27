@@ -2,7 +2,7 @@
 
 ## Original Project
 
-This project extends **Game Glitch Investigator** (Module 1), a Streamlit-based number-guessing game that was intentionally shipped with bugs. The original goal was to experience what it feels like to debug AI-generated code: the secret number would reset on every guess, hints pointed the wrong direction, and the "New Game" button did nothing. Students played the broken game, identified the bugs using an AI assistant, and fixed them — learning about Streamlit session state, form handling, and how to ask better questions of AI tools.
+This project extends **Game Glitch Investigator** (Module 1), a Streamlit-based number-guessing game that was intentionally shipped with bugs. The original goal was to experience what it feels like to debug AI-generated code: the secret number would reset on every guess, hints pointed the wrong direction, and the "New Game" button did nothing. Students played the broken game, identified the bugs using an AI assistant, and fixed them learning about Streamlit session state, form handling, and how to ask better questions of AI tools.
 
 ---
 
@@ -34,7 +34,7 @@ flowchart TD
 
     Results["📋 Results\nBug list · Fixed code · Verdict"]
     Human(["👤 Human Review\nUser reads output and decides\nwhether to apply the fix"])
-    Tests["🧪 pytest — 15 tests\nparse_guess · check_guess\nupdate_score · reset_game"]
+    Tests["🧪 pytest — 26 tests\nparse_guess · check_guess · update_score · reset_game\nvalidate_input · _extract_code"]
 
     User --> Validator
     Validator -- "invalid input" --> Err
@@ -252,9 +252,15 @@ AI-generated code fixes can introduce new bugs or misunderstand intent. The syst
 
 ## Testing Summary
 
+### Reliability summary
+
+**26 out of 26 tests pass.** The input guardrail (`validate_input`) rejects all invalid submissions before a token is spent. The three-step pipeline acts as a structural reliability layer: the Evaluator (Step 3) self-checks the fix and explicitly flags anything unresolved or newly introduced. Every API call logs its token counts to the terminal; API errors (auth failures, rate limits) are caught and surfaced to the user without crashing the app.
+
 ### What the tests cover
 
-The `pytest` suite (15 tests in `tests/test_game_logic.py`) covers the four core game logic functions:
+Two test files cover different layers of the system:
+
+**`tests/test_game_logic.py` — 15 tests** cover the four core game logic functions:
 
 | Function | Tests |
 |----------|-------|
@@ -263,29 +269,36 @@ The `pytest` suite (15 tests in `tests/test_game_logic.py`) covers the four core
 | `check_guess` | Correct guess, too high, too low |
 | Full submit flow | Win path, wrong guess, invalid input never reaching `check_guess` |
 
-All 15 tests pass. The tests import `parse_guess`, `check_guess`, and `update_score` directly from `app.py` to verify the functions the UI actually calls, and `reset_game` from `logic_utils.py`.
+**`tests/test_ai_detective.py` — 11 tests** cover the AI pipeline helper functions (no API calls required):
+
+| Function | Tests |
+|----------|-------|
+| `validate_input` | Empty string, whitespace-only, valid code, too long, exactly at limit, one over limit |
+| `_extract_code` | Plain fence, `python` fence, no fence (fallback), multiline, prose outside fence |
+
+The game logic tests import directly from `app.py` and `logic_utils.py` to verify the functions the UI actually calls. The AI detective tests exercise the guardrail and code-extraction logic in isolation, so they run in milliseconds with no network dependency.
 
 ### What worked
 
-- The streaming approach in Step 1 gave immediate visual feedback that made the app feel responsive even when the model was taking several seconds to reason.
-- The self-critique step (Step 3) caught cases where the generated fix was structurally correct but missed a secondary bug — it re-surfaced those as "NEEDS REVISION" with an explanation.
-- The three pre-loaded sample snippets made the demo immediately accessible without requiring the user to write or find buggy code.
+- The streaming approach in Step 1 gave immediate visual feedback that made the app feel responsive even when the model was taking several seconds to reason
+- The self-critique step (Step 3) caught cases where the generated fix was structurally correct but missed a secondary bug — it re-surfaced those as "NEEDS REVISION" with an explanation
+- The three pre-loaded sample snippets made the demo immediately accessible without requiring the user to write or find buggy code
 
 ### What didn't work initially
 
-- The first version used `st.stop()` inside the tab context managers, which prevented the second and third tabs from rendering when game state reached "won" or "lost." Replacing `st.stop()` with conditional rendering (`if status != "playing": ... else: ...`) fixed it.
-- Early testing showed the Fixer (Step 2) would sometimes wrap the fixed code in explanatory prose instead of returning just the code block. Adding explicit instruction in the system prompt ("Return ONLY the fixed Python code inside a ```python code block. No prose, no explanation.") and a regex extraction fallback resolved it.
+- The first version used `st.stop()` inside the tab context managers, which prevented the second and third tabs from rendering when game state reached "won" or "lost." Replacing `st.stop()` with conditional rendering (`if status != "playing": ... else: ...`) fixed it
+- Early testing showed the Fixer (Step 2) would sometimes wrap the fixed code in explanatory prose instead of returning just the code block. Adding explicit instruction in the system prompt ("Return ONLY the fixed Python code inside a ```python code block. No prose, no explanation.") and a regex extraction fallback resolved it
 
 ### What I learned
 
-Writing tests before fully understanding Streamlit's session state model revealed exactly why the original project's secret number kept changing — the test for `reset_game` made it obvious that state needed to be initialized once and mutated deliberately, not re-created on every script rerun.
+Writing tests before fully understanding Streamlit's session state model revealed exactly why the original project's secret number kept changing — the test for `reset_game` made it obvious that state needed to be initialized once and mutated deliberately, not re-created on every script rerun
 
 ---
 
 ## Reflection
 
-This project changed how I think about what "using AI" actually means in practice. In the original module, I used Claude as a search engine — I pasted an error and waited for an answer. Building the Bug Detective forced me to think about AI as infrastructure: how do you structure a pipeline so each step produces output the next step can actually use? How do you handle a model that sometimes wraps its answer in prose you didn't ask for? How do you give a user enough information to make a trust decision without overwhelming them?
+This project changed how I think about what "using AI" actually means in practice. In the original module, I used Claude as a search engine, I pasted an error and waited for an answer. Building the Bug Detective forced me to think about AI as infrastructure, asking questions like: how do you structure a pipeline so each step produces output the next step can actually use? How do you handle a model that sometimes wraps its answer in prose you didn't ask for? How do you give a user enough information to make a trust decision without overwhelming them?
 
-The self-critique step (Step 3) was the most instructive part. I assumed that if the model wrote a fix, it would be confident the fix was right. But the Evaluator regularly catches its own mistakes — not because it was told to find them, but because reading the original code, the bug list, and the proposed fix together creates enough context for it to reason about correctness independently. That's genuinely different from a spell-checker or a linter. It's closer to asking a second developer to review a pull request.
+The self-critique step (Step 3) was the most instructive part. I assumed that if the model wrote a fix, it would be confident the fix was right. But the Evaluator regularly catches its own mistakes, not because it was told to find them, but because reading the original code, the bug list, and the proposed fix together creates enough context for it to reason about correctness independently. That's genuinely different from a spell-checker or a linter. It's closer to asking a second developer to review a pull request
 
-The biggest takeaway is that AI reliability comes from design, not from the model alone. A model that can do three things well (analyze, fix, verify) is more trustworthy than the same model asked to do all three in one shot, because each step is checkable. That principle — break the problem into stages, make each stage's output visible, keep a human in the loop at the end — applies well beyond code review.
+The biggest takeaway is that AI reliability comes from design, not from the model alone. A model that can do three things well (analyze, fix, verify) is more trustworthy than the same model asked to do all three in one shot, because each step is checkable. That principle, breaking the problem into stages, make each stage's output visible, keep a human in the loop at the end, applies well beyond code review
