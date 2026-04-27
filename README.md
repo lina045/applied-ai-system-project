@@ -2,13 +2,14 @@
 
 ## Video Walkthrough
 
-[▶ Watch the Loom walkthrough](https://www.loom.com/share/YOUR_LOOM_ID_HERE)
+(https://www.loom.com/share/3f70d110fb1148329c984e519a9c962f)
+
 
 ---
 
 ## Portfolio Reflection
 
-This project shows that I can move beyond using AI as a search engine and start designing with it as infrastructure. I built a system where three AI calls work together — each one passing real output to the next — instead of asking a single prompt to do everything at once. I wrote tests that proved the guardrails work before a user ever touches the app. I ran into cases where the AI gave confident advice that was wrong for my specific situation, and I learned to verify rather than trust. For me, that's what an AI engineer actually does: not just prompt a model, but design a system around it that is checkable, explainable, and safe enough for someone else to use.
+This project shows that I can move beyond using AI as a search engine and start designing with it as infrastructure. I built a system where three AI calls work together, each one passing real output to the next, instead of asking a single prompt to do everything at once. I wrote tests that proved the guardrails work before a user ever touches the app. I ran into cases where the AI gave confident advice that was wrong for my specific situation, and I learned to verify rather than trust. That is what an AI engineer actually does, not just prompt a model, but design a system around it that is checkable, explainable, and safe enough that someone else can use.
 
 ---
 
